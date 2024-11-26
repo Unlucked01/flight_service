@@ -118,9 +118,9 @@ async def test_kafka(num_objects: int):
             "passenger_name": f"Passenger {i}",
             "destination": f"Destination {i}",
             "price": i * 10.0,
-            "user_id": i % 10
+            "user_id": i % 9 + 1
 
-        } for i in range(1, num_objects + 1)
+        } for i in range(num_objects)
     ]
 
     created_tickets = []
