@@ -44,7 +44,10 @@ async def read_root():
 @app.post("/users", response_model=User)
 async def create_user(user: User):
     user_data = user.model_dump(by_alias=True)
-    result = await collection.insert_one(user_data)
+    try:
+        result = await collection.insert_one(user_data)
+    except Exception:
+        raise HTTPException(status_code=409, detail=f"User already exists")
     user_data["_id"] = int(result.inserted_id)
     return user_data
 

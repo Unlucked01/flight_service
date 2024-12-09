@@ -49,14 +49,8 @@ async def get_all_tickets():
 
 @app.get("/tickets/{ticket_id}", response_model=FlightTicket)
 async def get_ticket(ticket_id: str):
-    cache_key = f"ticket_{ticket_id}"
-    cached_data = await get_cache(cache_key, redis)
-    if cached_data:
-        return cached_data
-
     ticket = await collection.find_one({"_id": ticket_id})
     if ticket:
-        await set_cache(cache_key, ticket, redis)
         return ticket
     raise HTTPException(status_code=404, detail="Ticket not found")
 
@@ -89,8 +83,6 @@ async def update_ticket(ticket_id: str, updated_ticket: FlightTicket):
     result = await collection.update_one({"_id": ticket_id}, {"$set": updated_ticket.model_dump(by_alias=True)})
     if result.modified_count == 1:
         updated_ticket_dict = await collection.find_one({"_id": ticket_id})
-
-        await set_cache(f"ticket_{ticket_id}", updated_ticket_dict, redis)
         return updated_ticket_dict
     raise HTTPException(status_code=404, detail="Ticket not found")
 

@@ -84,5 +84,31 @@ services:
     ports:
       - "8000:8000"
 
+  api_gateway:
+    build:
+      context: ./api_gateway
+    image: api_gateway:latest
+    depends_on:
+      - user_service
+      - flight_ticket_service
+    ports:
+      - "8010:8010"
+
+  tests:
+    build:
+      context: ./api_gateway
+    image: tests:latest
+    depends_on:
+      - api_gateway
+      - user_service
+      - flight_ticket_service
+      - mongo
+    environment:
+      - TESTING=true
+    command: [ "pytest", "--disable-warnings", "--maxfail=1", "-v" ]
+    volumes:
+      - ./api_gateway:/app
+
+
 volumes:
   mongo_data:
